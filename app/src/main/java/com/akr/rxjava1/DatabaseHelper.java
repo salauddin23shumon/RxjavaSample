@@ -5,9 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import androidx.annotation.Nullable;
-
-import com.akr.rxjava1.model.Upazilla;
+import com.akr.rxjava1.model.City;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -55,17 +53,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean insertUpazillaData(Upazilla upazilla) {
+    public boolean insertUpazillaData(City city) {
 
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(LOCAL_ID, upazilla.getId());
-        contentValues.put(CODE_COLUMN, upazilla.getCode());
-        contentValues.put(NAME_COLUMN, upazilla.getName());
-        contentValues.put(ACTIVE_COLUMN, upazilla.getActive());
-        contentValues.put(INSERT_ON, upazilla.getInsertedOn());
-        contentValues.put(INSERT_BY, upazilla.getInsertedBy());
-        contentValues.put(DISTRICT_ID_COLUMN, upazilla.getDistrictID());
+        contentValues.put(LOCAL_ID, city.getId());
+        contentValues.put(CODE_COLUMN, city.getCode());
+        contentValues.put(NAME_COLUMN, city.getName());
+        contentValues.put(ACTIVE_COLUMN, city.getActive());
+        contentValues.put(INSERT_ON, city.getInsertedOn());
+        contentValues.put(INSERT_BY, city.getInsertedBy());
+        contentValues.put(DISTRICT_ID_COLUMN, city.getDistrictID());
         long result = db.insert(UPAZILLA_TABLE, null, contentValues);
 
 

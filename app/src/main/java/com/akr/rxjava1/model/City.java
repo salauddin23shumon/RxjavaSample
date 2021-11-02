@@ -3,39 +3,30 @@ package com.akr.rxjava1.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 
-public class Upazilla implements Parcelable {
+@Entity(tableName = "city_tbl")
+public class City implements Serializable {
+
+    @PrimaryKey(autoGenerate = true)
     private int id;
+    @ColumnInfo(name = "code")
     private String code;
+    @ColumnInfo(name = "name")
     private String name;
+    @ColumnInfo(name = "active")
     private int active;
+    @ColumnInfo(name = "insertby")
     private int insertedBy;
+    @ColumnInfo(name = "updateby")
     private String insertedOn;
+    @ColumnInfo(name = "districtid")
     private String districtID;
 
-
-    protected Upazilla(Parcel in) {
-        id = in.readInt();
-        code = in.readString();
-        name = in.readString();
-        active = in.readInt();
-        insertedBy = in.readInt();
-        insertedOn = in.readString();
-        districtID = in.readString();
-    }
-
-    public static final Creator<Upazilla> CREATOR = new Creator<Upazilla>() {
-        @Override
-        public Upazilla createFromParcel(Parcel in) {
-            return new Upazilla(in);
-        }
-
-        @Override
-        public Upazilla[] newArray(int size) {
-            return new Upazilla[size];
-        }
-    };
 
     public int getId() {
         return id;
@@ -93,19 +84,4 @@ public class Upazilla implements Parcelable {
         this.districtID = districtID;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(code);
-        dest.writeString(name);
-        dest.writeInt(active);
-        dest.writeInt(insertedBy);
-        dest.writeString(insertedOn);
-        dest.writeString(districtID);
-    }
 }

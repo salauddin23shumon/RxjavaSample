@@ -8,19 +8,18 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.akr.rxjava1.model.Upazilla;
-import com.google.gson.Gson;
+import com.akr.rxjava1.model.City;
+import com.akr.rxjava1.model.room.AppDb;
 
+import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
@@ -29,6 +28,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> arr;
     List<String> names = new ArrayList<>();
     DatabaseHelper databaseHelper;
-    List<Upazilla> upazillaList = new ArrayList<>();
+    List<City> cityList = new ArrayList<>();
+    private AppDb db;
     private static final String TAG = "MainActivity";
 
     @Override
@@ -52,25 +53,27 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.list);
         progressBar = findViewById(R.id.progress_circular);
         databaseHelper = new DatabaseHelper(this);
+        db = AppDb.getInstance(this);
     }
 
     public void loadData(View view) {
-        rxCall();
+//        rxCall();
 //        retrofitCall();
+        rxFlowable();
         progressBar.setVisibility(View.VISIBLE);
     }
 
     private void retrofitCall() {
         ApiInterface api = ApiClient.getApiService();
-        Call<List<Upazilla>> call = api.getUpazilla0();
-        call.enqueue(new Callback<List<Upazilla>>() {
+        Call<List<City>> call = api.getUpazilla0();
+        call.enqueue(new Callback<List<City>>() {
             @Override
-            public void onResponse(Call<List<Upazilla>> call, Response<List<Upazilla>> response) {
+            public void onResponse(Call<List<City>> call, Response<List<City>> response) {
 
                 if (response.isSuccessful()) {
 
-                    for (Upazilla upazilla : response.body()) {
-                        names.add(upazilla.getName());
+                    for (City city : response.body()) {
+                        names.add(city.getName());
                     }
 
                     arr = new ArrayAdapter<String>(
@@ -84,38 +87,46 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Upazilla>> call, Throwable t) {
+            public void onFailure(Call<List<City>> call, Throwable t) {
                 Log.e(TAG, "onResponse: " + t.getMessage());
 
             }
         });
     }
 
-    private void rxCall() {
-        Observable<Response<List<Upazilla>>> upazillaObservable = ApiClient.getApiService().getUpazilla1();
+//    private Observable<Integer> cityInsert(List<City>){
+//
+//        return
+//
+//    }
 
-        upazillaObservable
-                .observeOn(AndroidSchedulers.mainThread())
+    private void rxCall() {
+
+        
+
+       Completable completable1 =  Completable.fromAction(() -> ApiClient.getApiService().getCity1())
+                .subscribeOn(Schedulers.io());
+
+
+
+
+        Observable<Response<List<City>>> cityObservable = ApiClient.getApiService().getCity1();
+        cityObservable
                 .subscribeOn(Schedulers.newThread())
-                .doOnNext(new Consumer<Response<List<Upazilla>>>() {
-                    @Override
-                    public void accept(Response<List<Upazilla>> listResponse) throws Exception {
-                        Log.e(TAG, "accept: " + Thread.currentThread() + " " + listResponse.body().size());
-                    }
-                })
-                .subscribe(new Observer<Response<List<Upazilla>>>() {
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Response<List<City>>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         Log.e(TAG, "onSubscribe: " + Thread.currentThread());
                     }
 
                     @Override
-                    public void onNext(@NonNull Response<List<Upazilla>> response) {
-//                        Log.e(TAG, "onNext: "+response.body().size() );     // TODO: 08-Sep-21 null exception
+                    public void onNext(@NonNull Response<List<City>> response) {
+
                         if (response != null) {
                             Log.e(TAG, "onNext: " + response.code() + " " + Thread.currentThread());
-                            for (Upazilla upazilla : response.body()) {
-                                names.add(upazilla.getName());
+                            for (City city : response.body()) {
+                                names.add(city.getName());
                             }
 
                             arr = new ArrayAdapter<String>(
@@ -145,7 +156,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        /*upazillaObservable.fromCallable(new Response<List<Upazilla>>() {
+
+
+        /*cityObservable.fromCallable(new Response<List<Upazilla>>() {
             @Override
             public Response<List<Upazilla>> call() throws Exception {
                 Log.e(TAG, "call: ");
@@ -196,10 +209,57 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });*/
 
+    }
 
+    private void rxFlowable(){
+        Flowable<Response<List<City>>> upazillaObservable = ApiClient.getApiService().getUpazilla2();
 
+        upazillaObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<Response<List<City>>>() {
 
+                    @Override
+                    public void onSubscribe(@NonNull Subscription s) {
+                        s.request(Long.MAX_VALUE);
+                        Log.e(TAG, "onSubscribe: "+Thread.currentThread().getName() );
+                    }
 
+                    @Override
+                    public void onNext(@NonNull Response<List<City>> response) {
+                        if (response != null) {
+                            Log.e(TAG, "onNext: code-" + response.code() + " thread: " + Thread.currentThread()+ " size: "+response.body().size());
+                            for (City city : response.body()) {
+                                names.add(city.getName());
+                                databaseHelper.insertUpazillaData(city);
+                            }
+
+                            arr = new ArrayAdapter<String>(
+                                    MainActivity.this, R.layout.support_simple_spinner_dropdown_item, names);
+
+                            listView.setAdapter(arr);
+                        } else {
+                            Log.e(TAG, "onNext: null");
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        progressBar.setVisibility(View.GONE);
+                        if (e instanceof HttpException) {
+                            Log.e(TAG, "onError: " + ((HttpException) e).code());
+                        } else {
+                            // This is another exception, like invalid JSON, etc.
+                            Log.e(TAG, "onError: ", e);
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        progressBar.setVisibility(View.GONE);
+                        Log.e(TAG, "onComplete: " + Thread.currentThread());
+                    }
+                });
     }
 
 }

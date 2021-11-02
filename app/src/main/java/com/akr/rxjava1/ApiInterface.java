@@ -2,15 +2,15 @@ package com.akr.rxjava1;
 
 
 import com.akr.rxjava1.model.District;
-import com.akr.rxjava1.model.Upazilla;
+import com.akr.rxjava1.model.City;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 public interface ApiInterface {
     /*
@@ -40,10 +40,15 @@ public interface ApiInterface {
     Call<List<District>> getDistrict();
 
     @GET("upazilla/all")
-    Call<List<Upazilla>> getUpazilla0();
+    Call<List<City>> getUpazilla0();
 
     @GET("upazilla/all")
-    Observable<Response<List<Upazilla>>> getUpazilla1();
+    Observable<Response<List<City>>> getCity1();
+
+    @GET("upazilla/all")
+    Flowable<Response<List<City>>> getUpazilla2();
+
+
 //    @GET("slum/all")
 //    Call<List<Slum>> getSlum();
 //    @GET("slumarea/all")
