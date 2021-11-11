@@ -46,6 +46,9 @@ public interface ApiInterface {
     Observable<Response<List<City>>> getCity1();
 
     @GET("upazilla/all")
+    Observable<List<City>> getCity();
+
+    @GET("upazilla/all")
     Flowable<Response<List<City>>> getUpazilla2();
 
 

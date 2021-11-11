@@ -22,20 +22,17 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RxInterface {
 
     ListView listView;
     ProgressBar progressBar;
@@ -59,7 +56,9 @@ public class MainActivity extends AppCompatActivity {
     public void loadData(View view) {
 //        rxCall();
 //        retrofitCall();
-        rxFlowable();
+//        rxFlowable();
+//        Rx();
+        rx2();
         progressBar.setVisibility(View.VISIBLE);
     }
 
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void rxCall() {
 
-        
+
 
        Completable completable1 =  Completable.fromAction(() -> ApiClient.getApiService().getCity1())
                 .subscribeOn(Schedulers.io());
@@ -260,6 +259,57 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, "onComplete: " + Thread.currentThread());
                     }
                 });
+    }
+
+    private void rx2(){
+        loadDataFromCloud()
+                .doOnNext(new Consumer<List<City>>() {
+                    @Override
+                    public void accept(List<City> data) throws Exception {
+                        Log.d(TAG, "accept1: "+Thread.currentThread().getName());
+                        MainActivity.this.saveDataToDisk(data)
+                                .subscribeOn(Schedulers.io());
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<City>>() {
+                    @Override
+                    public void accept(List<City> data) throws Exception {
+                        updateUI(data);
+                        Log.d(TAG, "accept: " + Thread.currentThread().getName());
+                    }
+                },Throwable::printStackTrace);
+    }
+
+    private void updateUI(List<City> cities) {
+        for (City city : cities) {
+            names.add(city.getName());
+        }
+
+        arr = new ArrayAdapter<String>(
+                MainActivity.this, R.layout.support_simple_spinner_dropdown_item, names);
+
+        listView.setAdapter(arr);
+        progressBar.setVisibility(View.GONE);
+    }
+
+
+    @Override
+    public Observable<List<City>> loadDataFromCloud() {
+        return ApiClient.getApiService().getCity();
+    }
+
+    @Override
+    public Observable<Long> saveDataToDisk(List<City> cityList) {
+        long ln = 0;
+        Log.e(TAG, "saveDataToDisk: "+cityList.size() +" "+Thread.currentThread().getName());
+        for (City city : cityList) {
+            names.add(city.getName());
+            ln = databaseHelper.insertUpazillaData(city);
+        }
+        return Observable.<Long>just(ln).
+                cast(Long.class);
     }
 
 }

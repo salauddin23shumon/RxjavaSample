@@ -53,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean insertUpazillaData(City city) {
+    public long insertUpazillaData(City city) {
 
 
         ContentValues contentValues = new ContentValues();
@@ -65,13 +65,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(INSERT_BY, city.getInsertedBy());
         contentValues.put(DISTRICT_ID_COLUMN, city.getDistrictID());
         long result = db.insert(UPAZILLA_TABLE, null, contentValues);
-
-
-        if (result == -1)
-            return false;
-        else
-            return true;
+        return result;
 
     }
 
-    }
+}
