@@ -2,6 +2,7 @@ package com.akr.rxjava1;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,7 +33,7 @@ import retrofit2.Callback;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements RxInterface {
+public class MainActivity extends AppCompatActivity {
 
     ListView listView;
     ProgressBar progressBar;
@@ -262,24 +263,40 @@ public class MainActivity extends AppCompatActivity implements RxInterface {
     }
 
     private void rx2(){
-        loadDataFromCloud()
+        Observable<List<City>> cityObservable = ApiClient.getApiService().getCity();
+        cityObservable
                 .doOnNext(new Consumer<List<City>>() {
                     @Override
                     public void accept(List<City> data) throws Exception {
                         Log.d(TAG, "accept1: "+Thread.currentThread().getName());
-                        MainActivity.this.saveDataToDisk(data)
-                                .subscribeOn(Schedulers.io());
+                       saveToDisk(data)
+                                .subscribeOn(Schedulers.io())
+                       .map(aLong -> Log.d(TAG, "accept1: "+aLong));
                     }
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<City>>() {
+                .subscribe(new Observer<List<City>>() {
                     @Override
-                    public void accept(List<City> data) throws Exception {
-                        updateUI(data);
-                        Log.d(TAG, "accept: " + Thread.currentThread().getName());
+                    public void onSubscribe(@NonNull Disposable d) {
+
                     }
-                },Throwable::printStackTrace);
+
+                    @Override
+                    public void onNext(@NonNull List<City> cities) {
+                        updateUI(cities);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void updateUI(List<City> cities) {
@@ -291,19 +308,13 @@ public class MainActivity extends AppCompatActivity implements RxInterface {
                 MainActivity.this, R.layout.support_simple_spinner_dropdown_item, names);
 
         listView.setAdapter(arr);
-        progressBar.setVisibility(View.GONE);
+
     }
 
 
-    @Override
-    public Observable<List<City>> loadDataFromCloud() {
-        return ApiClient.getApiService().getCity();
-    }
-
-    @Override
-    public Observable<Long> saveDataToDisk(List<City> cityList) {
+    public Observable<Long> saveToDisk(List<City> cityList) {
         long ln = 0;
-        Log.e(TAG, "saveDataToDisk: "+cityList.size() +" "+Thread.currentThread().getName());
+        Log.e(TAG, "savDisk: "+cityList.size() +" "+Thread.currentThread().getName());
         for (City city : cityList) {
             names.add(city.getName());
             ln = databaseHelper.insertUpazillaData(city);
@@ -311,5 +322,12 @@ public class MainActivity extends AppCompatActivity implements RxInterface {
         return Observable.<Long>just(ln).
                 cast(Long.class);
     }
+
+    public void goToNext(View view) {
+        Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+        startActivity(intent);
+        finish();
+    }
+
 
 }
