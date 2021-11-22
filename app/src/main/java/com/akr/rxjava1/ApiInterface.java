@@ -18,7 +18,7 @@ public interface ApiInterface {
 
 
     @GET("district/all")
-    Observable<List<District>> getDistrict();
+    Flowable<List<District>> getDistrict();
 
     @GET("upazilla/all")
     Call<List<City>> getUpazilla0();
@@ -27,12 +27,15 @@ public interface ApiInterface {
     Observable<Response<List<City>>> getCity1();
 
     @GET("upazilla/all")
-    Observable<List<City>> getCity();
+    Flowable<List<City>> getCity();
+
+    @GET("upazilla/all")
+    Observable<List<City>> getCity2();
 
     @GET("upazilla/all")
     Flowable<Response<List<City>>> getUpazilla2();
 
     @GET("division/all")
-    Observable<List<Division>> getDivision();
+    Flowable<List<Division>> getDivision();
 }
 

@@ -7,8 +7,11 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import com.akr.rxjava1.model.City;
+import com.akr.rxjava1.model.District;
+import com.akr.rxjava1.model.Division;
 
-@Database(entities = {City.class}, version = 1, exportSchema = false)
+@Database(entities = {City.class, District.class, Division.class}, version = 1, exportSchema = false)
+
 public abstract class AppDb  extends RoomDatabase {
     
     public static AppDb appDb;
@@ -25,6 +28,6 @@ public abstract class AppDb  extends RoomDatabase {
         return appDb;
     }
 
-    public abstract CityDao dao();      //abstract method of type SensorDao
+    public abstract AppDao dao();      //abstract method of type SensorDao
 
 }

@@ -27,6 +27,8 @@ public class City implements Serializable {
     @ColumnInfo(name = "districtid")
     private String districtID;
 
+    public City() {
+    }
 
     public int getId() {
         return id;

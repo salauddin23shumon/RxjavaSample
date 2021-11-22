@@ -1,24 +1,39 @@
 package com.akr.rxjava1.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "division_tbl")
 public class Division {
+
+    @PrimaryKey(autoGenerate = true)
     @SerializedName("id")
     @Expose
     private Integer id;
 
+    @ColumnInfo
     @SerializedName("code")
     @Expose
     private String code;
 
+    @ColumnInfo
     @SerializedName("name")
     @Expose
     private String name;
 
+    @ColumnInfo
     private int active;
+    @ColumnInfo
     private int insertedBy;
+    @ColumnInfo
     private String insertedOn;
+
+    public Division() {
+    }
 
     public Integer getId() {
         return id;

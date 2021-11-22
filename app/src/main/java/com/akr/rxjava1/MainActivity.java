@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     ArrayAdapter<String> arr;
     List<String> names = new ArrayList<>();
-    DatabaseHelper databaseHelper;
+//    DatabaseHelper databaseHelper;
     List<City> cityList = new ArrayList<>();
     private AppDb db;
     private static final String TAG = "MainActivity";
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         listView = findViewById(R.id.list);
         progressBar = findViewById(R.id.progress_circular);
-        databaseHelper = new DatabaseHelper(this);
+//        databaseHelper = new DatabaseHelper(this);
         db = AppDb.getInstance(this);
     }
 
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.e(TAG, "onNext: code-" + response.code() + " thread: " + Thread.currentThread()+ " size: "+response.body().size());
                             for (City city : response.body()) {
                                 names.add(city.getName());
-                                databaseHelper.insertUpazillaData(city);
+//                                databaseHelper.insertUpazillaData(city);
                             }
 
                             arr = new ArrayAdapter<String>(
@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void rx2(){
-        Observable<List<City>> cityObservable = ApiClient.getApiService().getCity();
+        Observable<List<City>> cityObservable = ApiClient.getApiService().getCity2();
         cityObservable
                 .doOnNext(new Consumer<List<City>>() {
                     @Override
@@ -315,10 +315,11 @@ public class MainActivity extends AppCompatActivity {
     public Observable<Long> saveToDisk(List<City> cityList) {
         long ln = 0;
         Log.e(TAG, "savDisk: "+cityList.size() +" "+Thread.currentThread().getName());
-        for (City city : cityList) {
-            names.add(city.getName());
-            ln = databaseHelper.insertUpazillaData(city);
-        }
+        db.dao().insert(cityList);
+//        for (City city : cityList) {
+//            names.add(city.getName());
+////            ln = databaseHelper.insertUpazillaData(city);
+//        }
         return Observable.<Long>just(ln).
                 cast(Long.class);
     }

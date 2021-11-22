@@ -1,29 +1,30 @@
 package com.akr.rxjava1.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 
+@Entity(tableName = "district_tbl")
 public class District implements Serializable {
+
+    @PrimaryKey(autoGenerate = true)
     private int id;
+    @ColumnInfo(name = "code")
     private String code;
+    @ColumnInfo(name = "name")
     private String name;
+    @ColumnInfo(name = "active")
     private int active;
+    @ColumnInfo(name = "insertedBy")
     private int insertedBy;
+    @ColumnInfo(name = "insertedOn")
     private String insertedOn;
+
     private String divisionID;
 
-    public District(int id, String code, String name, int active, int insertedBy, String insertedOn,String divisionID) {
-        super();
-        this.id = id;
-        this.code = code;
-        this.name = name;
-        this.active = active;
-        this.insertedBy = insertedBy;
-        this.insertedOn = insertedOn;
-        this.divisionID = divisionID;
-    }
-
     public District() {
-        super();
     }
 
     public int getId() {
